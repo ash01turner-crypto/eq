@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Project Polaris - Management Adventure</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+      color: #222;
+      background: #111;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(circle at top, #1f2933, #020617 60%);
+      color: #e5e7eb;
+    }
+    .game-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px 16px 48px;
+    }
+    .game-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 16px;
+      padding: 24px 20px 28px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+    }
+    h1, h2 {
+      margin-top: 0;
+      line-height: 1.2;
+      color: #f9fafb;
+    }
+    h1 {
+      font-size: 1.7rem;
+      margin-bottom: 0.25rem;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.75rem;
+    }
+    .tagline {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-bottom: 1.4rem;
+    }
+    p {
+      margin: 0.4rem 0;
+      color: #e5e7eb;
+    }
+    ul {
+      padding-left: 1.2rem;
+      margin: 0.4rem 0 0.6rem;
+    }
+    .choices {
+      margin-top: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .choice-btn {
+      text-align: left;
+      padding: 0.55rem 0.75rem;
+      border-radius: 0.65rem;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 64, 175, 0.35));
+      color: #e5e7eb;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.08s ease, background 0.12s ease;
+    }
+    .choice-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.7);
+      border-color: #60a5fa;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 1), rgba(37, 99, 235, 0.65));
+    }
+    .choice-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+    .passage {
+      display: none;
+      animation: fadeIn 0.22s ease-out;
+    }
+    .passage.active {
+      display: block;
+    }
+    .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+      margin-bottom: 0.5rem;
+    }
+    .outcome-good {
+      border-left: 4px solid #22c55e;
+      padding-left: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .outcome-bad {
+      border-left: 4px solid #f97316;
+      padding-left: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .outcome-fail {
+      border-left: 4px solid #ef4444;
+      padding-left: 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.18);
+      border: 1px solid rgba(59, 130, 246, 0.5);
+      color: #bfdbfe;
+      margin-bottom: 0.3rem;
+    }
+    .pill span {
+      font-size: 0.9em;
+    }
+    .meta {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 0.8rem;
+      font-style: italic;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+    <div class="game-card" id="game">
+
+      <!-- START -->
+      <section class="passage active" id="start">
+        <div class="pill"><span>◎</span><span>Interactive Scenario</span></div>
+        <h1>Project Polaris</h1>
+        <p class="tagline">You’re leading a high-stakes project. Your choices shape delivery, trust and burnout.</p>
+
+        <p>You’re the project lead for <strong>Project Polaris</strong> – a critical upgrade that must go live before the end of the quarter.</p>
+        <p>Your team is a mix of veterans and newer staff, and senior leaders have made it very clear: this one can’t slip.</p>
+        <p>It’s Monday morning. You’ve just grabbed your coffee and opened your inbox. Three things jump out at you:</p>
+        <ul>
+          <li>A message from your sponsor asking for a “quick status update” by lunchtime.</li>
+          <li>A calendar clash between your project stand-up and a key stakeholder workshop.</li>
+          <li>A note from HR flagging that one of your team members, Wes, has had several recent absences.</li>
+        </ul>
+        <p>Where do you focus first?</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('team-standup')">
+            Meet with the project team before doing anything else.
+          </button>
+          <button class="choice-btn" onclick="goTo('sponsor-call')">
+            Talk to the sponsor to manage expectations.
+          </button>
+          <button class="choice-btn" onclick="goTo('hr-concern')">
+            Follow up on the HR note about Wes.
+          </button>
+        </div>
+      </section>
+
+      <!-- TEAM STANDUP -->
+      <section class="passage" id="team-standup">
+        <h2>Team Stand-up</h2>
+        <p>You gather the team in a small meeting room. People look tired. A couple of them check their phones as they sit down.</p>
+        <p>“How’s everyone going?” you ask.</p>
+        <p>Silence. Then Tash, your senior analyst, speaks up.</p>
+        <p><em>“We’re making progress, but the requirements keep changing. And the testing window is shrinking. If we keep adding scope, we’re going to miss the date.”</em></p>
+        <p>Some team members nod. Others look away.</p>
+        <p>How do you respond?</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('psych-safety')">
+            Acknowledge the pressure and invite people to raise risks openly.
+          </button>
+          <button class="choice-btn" onclick="goTo('deadline-push')">
+            Downplay the concerns and remind them of the deadline.
+          </button>
+          <button class="choice-btn" onclick="goTo('scope-detail')">
+            Drill into the details of the scope changes immediately.
+          </button>
+        </div>
+      </section>
+
+      <!-- SPONSOR CALL -->
+      <section class="passage" id="sponsor-call">
+        <h2>Sponsor Call</h2>
+        <p>You jump on a quick call with your sponsor, Karen.</p>
+        <p><em>“Just checking in,”</em> she says. <em>“The executives want reassurance we’re still on track. I’d like to tell them we’re green.”</em></p>
+        <p>You know there are risks: shrinking testing time, some unclear requirements, and a tired team. On paper, the date is still just about achievable.</p>
+        <p>What do you say?</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('honest-status')">
+            Be honest about the risks and propose a realistic status (amber).
+          </button>
+          <button class="choice-btn" onclick="goTo('overpromise')">
+            Reassure her you’re green and say the team will “do what it takes”.
+          </button>
+          <button class="choice-btn" onclick="goTo('ask-support')">
+            Ask for support in stabilising scope instead of talking colours.
+          </button>
+        </div>
+      </section>
+
+      <!-- HR CONCERN -->
+      <section class="passage" id="hr-concern">
+        <h2>HR Concern: Wes</h2>
+        <p>You open the HR note about Wes. Several recent sick days cluster around long weekends and key project activities.</p>
+        <p>HR has asked you to “check in and provide support” and to note any impact on delivery.</p>
+        <p>You find Wes in a quiet corner after the stand-up.</p>
+        <p>He looks tired and a little defensive. <em>“Is this about my sick leave?”</em> he asks.</p>
+        <p>How do you start the conversation?</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('supportive-chat')">
+            Lead with concern for him as a person and ask how he’s going.
+          </button>
+          <button class="choice-btn" onclick="goTo('performance-first')">
+            Lead with the impact on the project and missed meetings.
+          </button>
+          <button class="choice-btn" onclick="goTo('avoid-wes')">
+            Avoid the topic for now and focus on getting through this week.
+          </button>
+        </div>
+      </section>
+
+      <!-- PSYCH SAFETY -->
+      <section class="passage" id="psych-safety">
+        <h2>Creating Psychological Safety</h2>
+        <p>You take a breath.</p>
+        <p>“I appreciate the honesty,” you say. “If we’re going to hit this date without burning everyone out, I need to know about risks early. Let’s list what’s worrying us most, then we’ll decide together what to escalate or re-plan.”</p>
+        <p>You grab a whiteboard and invite input. Slowly, people start contributing. Tash outlines the impact of scope changes. Sam flags a dependency with another team that’s slipping.</p>
+        <p>By the end of the meeting you have a clearer picture and a short list of actions.</p>
+        <p>What’s your next move?</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('honest-status')">
+            Update the sponsor with a realistic view and some options.
+          </button>
+          <button class="choice-btn" onclick="goTo('manage-scope')">
+            Tighten up scope and push back on new requests.
+          </button>
+          <button class="choice-btn" onclick="goTo('call-for-overtime')">
+            Ask the team to work late this week to “catch up”.
+          </button>
+        </div>
+      </section>
+
+      <!-- DEADLINE PUSH -->
+      <section class="passage" id="deadline-push">
+        <h2>Pushing the Deadline</h2>
+        <p>You smile tightly.</p>
+        <p>“I hear you,” you say, “but we committed to this date. Let’s stay positive and just push through. We’ll fine-tune the details as we go.”</p>
+        <p>The room goes quiet. A couple of people exchange glances. No one raises any further risks.</p>
+        <p>On the surface, things seem under control. Underneath, people start making quiet compromises and assumptions.</p>
+        <p>Where do you go next?</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('call-for-overtime')">
+            Push the team to work extra hours to stay on track.
+          </button>
+          <button class="choice-btn" onclick="goTo('hr-concern')">
+            Check in with HR about Wes’s absences.
+          </button>
+          <button class="choice-btn" onclick="goTo('overpromise')">
+            Report “green” to the sponsor and move on.
+          </button>
+        </div>
+      </section>
+
+      <!-- SCOPE DETAIL -->
+      <section class="passage" id="scope-detail">
+        <h2>Digging into Scope</h2>
+        <p>You lean forward.</p>
+        <p>“Okay, let’s get specific. What exactly changed, and who requested it?”</p>
+        <p>The next 30 minutes are spent mapping recent change requests. You discover that several “small tweaks” from different stakeholders add up to a lot of extra work.</p>
+        <p>You realise you need to decide how to handle this.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('manage-scope')">
+            Push back on further scope changes and protect the team.
+          </button>
+          <button class="choice-btn" onclick="goTo('call-for-overtime')">
+            Accept the extra work and ask the team to “dig deep”.
+          </button>
+          <button class="choice-btn" onclick="goTo('honest-status')">
+            Escalate the issue to the sponsor and ask for a trade-off.
+          </button>
+        </div>
+      </section>
+
+      <!-- HONEST STATUS -->
+      <section class="passage" id="honest-status">
+        <h2>Honest Status</h2>
+        <p>You decide to be transparent.</p>
+        <p>“Karen, we can still aim for the target date,” you say, “but we’re carrying some real risks: expanding scope, limited testing time, and a stretched team. I recommend we report amber with a clear plan: either we lock scope now, add resources, or accept that quality could be impacted.”</p>
+        <p>There’s a pause.</p>
+        <p><em>“I appreciate the honesty,”</em> she says. <em>“Send me a short summary of those options. I’ll socialise it with the execs. In the meantime, do what you can to stabilise scope.”</em></p>
+        <p>You’ve traded short-term comfort for long-term credibility.</p>
+        <p>What do you do next?</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('manage-scope')">
+            Meet with key stakeholders to agree on scope boundaries.
+          </button>
+          <button class="choice-btn" onclick="goTo('share-with-team')">
+            Go back to the team and share the conversation.
+          </button>
+          <button class="choice-btn" onclick="goTo('supportive-chat')">
+            Turn your attention to supporting individuals like Wes.
+          </button>
+        </div>
+      </section>
+
+      <!-- OVERPROMISE -->
+      <section class="passage" id="overpromise">
+        <h2>Over-Promising</h2>
+        <p>You take the easy path.</p>
+        <p>“We’re green,” you say. “There are always a few bumps, but the team is committed. We’ll do what it takes.”</p>
+        <p>Karen sounds relieved.</p>
+        <p><em>“Great. I’ll tell the execs we’re on track. Keep up the good work.”</em></p>
+        <p>You end the call with a knot in your stomach. The risks are still there. Now they’re invisible to everyone except you and the team.</p>
+        <p>What next?</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('call-for-overtime')">
+            Ask the team to work longer hours to “make it happen”.
+          </button>
+          <button class="choice-btn" onclick="goTo('hard-driver')">
+            Ignore the discomfort and drive the schedule hard.
+          </button>
+          <button class="choice-btn" onclick="goTo('silent-fix')">
+            Quietly try to fix issues without involving stakeholders.
+          </button>
+        </div>
+      </section>
+
+      <!-- ASK SUPPORT -->
+      <section class="passage" id="ask-support">
+        <h2>Asking for Support</h2>
+        <p>You steer the conversation.</p>
+        <p>“Before we talk status colours, we need to stabilise scope,” you say. “We’re getting changes from multiple directions. If we can agree what’s truly in for this release, we can protect the date and the team.”</p>
+        <p>Karen sighs.</p>
+        <p><em>“Fair point. Draft a simple ‘in / out’ list and I’ll back you up with the other leaders.”</em></p>
+        <p>You’ve just bought yourself some political support.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('scope-workshop')">
+            Run a quick scope workshop with key stakeholders.
+          </button>
+          <button class="choice-btn" onclick="goTo('share-with-team')">
+            Bring the team into the conversation so they feel heard.
+          </button>
+        </div>
+      </section>
+
+      <!-- SUPPORTIVE CHAT -->
+      <section class="passage" id="supportive-chat">
+        <h2>Supportive Conversation with Wes</h2>
+        <p>You sit down so you’re at the same level as Wes.</p>
+        <p>“This is about making sure you’re okay,” you say. “I’ve noticed a few recent absences and some missed meetings. I’m not here to accuse you of anything, I just want to understand what’s going on and how we can support you.”</p>
+        <p>Wes exhales slowly.</p>
+        <p><em>“It’s been rough at home. I’ve been trying to juggle things, but I know I’ve let the team down.”</em></p>
+        <p>Together, you explore options: flexible hours, clearer expectations, and which meetings are truly critical.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('wes-plan')">
+            Agree on a clear plan and follow up in writing.
+          </button>
+          <button class="choice-btn" onclick="goTo('vague-support')">
+            Tell him you’ll “trust him to sort it out” and leave it vague.
+          </button>
+        </div>
+      </section>
+
+      <!-- PERFORMANCE FIRST -->
+      <section class="passage" id="performance-first">
+        <h2>Performance First</h2>
+        <p>You cross your arms.</p>
+        <p>“Wes, your absences are impacting Polaris. We need you present and reliable. This can’t continue.”</p>
+        <p>He stiffens.</p>
+        <p><em>“I was sick,”</em> he says. <em>“I’m doing my best.”</em></p>
+        <p>The conversation becomes defensive. You leave with a commitment to “improve”, but no real understanding of what’s happening.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('monitor-wes')">
+            Increase your monitoring of his attendance and escalate if needed.
+          </button>
+          <button class="choice-btn" onclick="goTo('sideline-wes')">
+            Decide it’s too hard and shift critical work away from him.
+          </button>
+        </div>
+      </section>
+
+      <!-- AVOID WES -->
+      <section class="passage" id="avoid-wes">
+        <h2>Putting Wes on Hold</h2>
+        <p>You skim the email, sigh, and mark it as unread to “deal with later”.</p>
+        <p>The week rolls on. Wes keeps missing some key sessions. The team quietly works around him, but resentment builds.</p>
+        <p>This will come back later.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('hard-driver')">
+            Continue focusing purely on delivery and ignore the people issues.
+          </button>
+        </div>
+      </section>
+
+      <!-- MANAGE SCOPE -->
+      <section class="passage" id="manage-scope">
+        <h2>Managing Scope</h2>
+        <p>You set up a quick meeting with the key stakeholders.</p>
+        <p>“Here’s the reality,” you say. “Every ‘small’ change adds up. If we keep adding, we either move the date or compromise quality. For this release, we need a clear line.”</p>
+        <p>After some back-and-forth, you get agreement on a <strong>frozen scope</strong> for Polaris. A few nice-to-haves are pushed to a later phase.</p>
+        <p>The team breathes a little easier.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('healthy-pace')">
+            Focus on rebuilding team energy and sustainable pace.
+          </button>
+          <button class="choice-btn" onclick="goTo('hard-driver')">
+            Use the breathing room to push for an even earlier date.
+          </button>
+        </div>
+      </section>
+
+      <!-- CALL FOR OVERTIME -->
+      <section class="passage" id="call-for-overtime">
+        <h2>Calling for Overtime</h2>
+        <p>You gather the team.</p>
+        <p>“I know it’s a big ask,” you say, “but we need a final push. If we put in some extra hours this week, we can keep the date and then ease off.”</p>
+        <p>Some people reluctantly nod. Others stare at the floor.</p>
+        <p>Over the next week, delivery accelerates. So does fatigue.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('healthy-pace')">
+            Notice the warning signs and step in to protect the team.
+          </button>
+          <button class="choice-btn" onclick="goTo('hard-driver')">
+            Keep driving hard to impress the sponsor.
+          </button>
+        </div>
+      </section>
+
+      <!-- SCOPE WORKSHOP -->
+      <section class="passage" id="scope-workshop">
+        <h2>Scope Workshop</h2>
+        <p>In a short virtual workshop, you walk stakeholders through a simple board: <strong>Now / Next / Later</strong>.</p>
+        <p>By the end, everyone can see that trying to do everything “now” is impossible. Some features move into “Next” and “Later”.</p>
+        <p>You’ve turned a messy requirements stream into a prioritised backlog.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('share-with-team')">
+            Share the outcome with the team and thank them.
+          </button>
+          <button class="choice-btn" onclick="goTo('silent-fix')">
+            Quietly use the clarity but don’t connect it back to the team’s feedback.
+          </button>
+        </div>
+      </section>
+
+      <!-- SHARE WITH TEAM -->
+      <section class="passage" id="share-with-team">
+        <h2>Closing the Loop with the Team</h2>
+        <p>You call the team together.</p>
+        <p>“I shared our risks and ideas with Karen,” you say. “She’s backing us to lock scope and protect testing. The workshop you helped shape made a real difference.”</p>
+        <p>There are a few surprised smiles. People sit a little straighter.</p>
+        <p>Tash grins. “So speaking up actually helped?”</p>
+        <p>You’ve just reinforced that raising risks is welcome.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('healthy-pace')">
+            Focus next on sustainable pace and wellbeing.
+          </button>
+          <button class="choice-btn" onclick="goTo('call-for-overtime')">
+            Use the goodwill to demand one more big push.
+          </button>
+        </div>
+      </section>
+
+      <!-- HEALTHY PACE -->
+      <section class="passage" id="healthy-pace">
+        <h2>Healthy Pace</h2>
+        <p>You consciously set a new tone.</p>
+        <p>You make space in stand-ups to talk about workload and capacity. You encourage people to flag when they’re stretched. You coordinate with other leaders to avoid unnecessary meetings.</p>
+        <p>You still work hard, but in a more focused way. Defects are caught early. People stay engaged.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('golive')">
+            Move towards go-live.
+          </button>
+        </div>
+      </section>
+
+      <!-- HARD DRIVER -->
+      <section class="passage" id="hard-driver">
+        <h2>Hard Driver</h2>
+        <p>You double down on delivery.</p>
+        <p>Overtime becomes the norm. People stop raising concerns because they don’t feel heard. Shortcuts creep into the work: test steps skipped, documentation left “for later”.</p>
+        <p>You might still make the date, but at a cost.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('golive')">
+            Move towards go-live.
+          </button>
+        </div>
+      </section>
+
+      <!-- SILENT FIX -->
+      <section class="passage" id="silent-fix">
+        <h2>Silent Fixer</h2>
+        <p>You try to solve everything quietly: chasing stakeholders one-on-one, patching scope and schedule issues yourself.</p>
+        <p>The team sees the stress but doesn’t quite know what’s happening. They don’t see how their input connects to decisions.</p>
+        <p>The system keeps moving, but people feel like cogs, not contributors.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('golive')">
+            Move towards go-live.
+          </button>
+        </div>
+      </section>
+
+      <!-- WES PLAN -->
+      <section class="passage" id="wes-plan">
+        <h2>Plan with Wes</h2>
+        <p>You agree with Wes on:</p>
+        <ul>
+          <li>Which meetings he must attend.</li>
+          <li>How he’ll signal if he’s struggling.</li>
+          <li>When you’ll check in again.</li>
+        </ul>
+        <p>You also quietly redistribute some non-critical tasks to ease his load.</p>
+        <p>Over the next few weeks, his attendance improves and the team notices he’s more present.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('golive')">
+            Move towards go-live.
+          </button>
+        </div>
+      </section>
+
+      <!-- VAGUE SUPPORT -->
+      <section class="passage" id="vague-support">
+        <h2>Vague Support</h2>
+        <p>You tell Wes, “Just do your best, I know it’s busy,” and leave it at that.</p>
+        <p>Without clear expectations or support, the pattern continues: occasional absences, missed handovers, quiet frustration from others.</p>
+        <p>The issue never properly resolves.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('golive')">
+            Move towards go-live.
+          </button>
+        </div>
+      </section>
+
+      <!-- MONITOR WES -->
+      <section class="passage" id="monitor-wes">
+        <h2>Monitoring Wes</h2>
+        <p>You start tracking Wes’s attendance and meeting behaviour closely. Every slip is noted.</p>
+        <p>He senses the scrutiny and withdraws even further. The team begins to treat him as a weak link, not a colleague.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('golive')">
+            Move towards go-live.
+          </button>
+        </div>
+      </section>
+
+      <!-- SIDELINE WES -->
+      <section class="passage" id="sideline-wes">
+        <h2>Sideling Wes</h2>
+        <p>You move critical tasks away from Wes without fully explaining why.</p>
+        <p>He notices, and so does the rest of the team. It solves some short-term reliability problems, but it also sends a message: people are replaceable, not supported.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('golive')">
+            Move towards go-live.
+          </button>
+        </div>
+      </section>
+
+      <!-- GO LIVE -->
+      <section class="passage" id="golive">
+        <h2>Go-Live Day</h2>
+        <p>Weeks pass. Decision by decision, you’ve shaped how Polaris unfolded.</p>
+        <p>On the morning of go-live, the atmosphere around the team reflects the path you chose.</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('outcome')">
+            Check your outcome.
+          </button>
+        </div>
+      </section>
+
+      <!-- OUTCOME -->
+      <section class="passage" id="outcome">
+        <h2>How Did Project Polaris End?</h2>
+        <p>Think back over your choices.</p>
+        <p>Pick the description that best matches how you tended to lead:</p>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('outcome-success')">
+            I mostly encouraged people to speak up, was honest with the sponsor, protected scope, supported individuals, and watched workload.
+          </button>
+          <button class="choice-btn" onclick="goTo('outcome-burnout')">
+            I often pushed deadlines no matter what, reported “green” despite risks, relied on overtime, and avoided hard people conversations.
+          </button>
+          <button class="choice-btn" onclick="goTo('outcome-failure')">
+            I avoided decisions, ignored HR concerns, let scope grow uncontrolled, and didn’t involve stakeholders.
+          </button>
+        </div>
+
+        <p class="meta">In a training setting, you can debrief here: which outcome feels most familiar, and what would you do differently?</p>
+      </section>
+
+      <!-- OUTCOME: SUCCESS -->
+      <section class="passage" id="outcome-success">
+        <h2>Outcome: Sustainable Success</h2>
+        <div class="outcome-good">
+          <p>Polaris goes live close to the original date. There are a few minor issues, but nothing critical. The sponsor is satisfied, and more importantly, the team feels proud of what they achieved.</p>
+          <p>People talk about Polaris as a project where:</p>
+          <ul>
+            <li>Risks were surfaced early,</li>
+            <li>Leaders were honest and fair,</li>
+            <li>Workload was tough but manageable.</li>
+          </ul>
+          <p><strong>You delivered the project and strengthened the team.</strong></p>
+        </div>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('start')">
+            Play again and explore different choices.
+          </button>
+        </div>
+      </section>
+
+      <!-- OUTCOME: BURNOUT -->
+      <section class="passage" id="outcome-burnout">
+        <h2>Outcome: Burnt-Out Delivery</h2>
+        <div class="outcome-bad">
+          <p>Polaris technically goes live on time, but it’s messy.</p>
+          <p>There are late-night fixes, urgent patches, and frayed tempers. A couple of people quietly start looking for other roles. The sponsor congratulates you on “getting it over the line,” but you know the cost.</p>
+          <p>People talk about Polaris as:</p>
+          <ul>
+            <li>“That death-march project”,</li>
+            <li>A place where speaking up didn’t matter,</li>
+            <li>A win for the schedule, not for the people.</li>
+          </ul>
+          <p><strong>You delivered the project, but burned a lot of goodwill.</strong></p>
+        </div>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('start')">
+            Play again and try a different leadership style.
+          </button>
+        </div>
+      </section>
+
+      <!-- OUTCOME: FAILURE -->
+      <section class="passage" id="outcome-failure">
+        <h2>Outcome: Slipped Project</h2>
+        <div class="outcome-fail">
+          <p>Polaris misses its original date. Scope crept steadily, risks went unaddressed, and people were never quite on the same page.</p>
+          <p>The sponsor is frustrated. The team is deflated. Trust in the project decreases, and future work will be under a much harsher spotlight.</p>
+          <p>People talk about Polaris as:</p>
+          <ul>
+            <li>“The one that got away”,</li>
+            <li>A lesson in what happens when issues are left to fester,</li>
+            <li>A reminder that inaction is also a decision.</li>
+          </ul>
+          <p><strong>You protected no one and still didn’t deliver.</strong></p>
+        </div>
+
+        <div class="choices">
+          <button class="choice-btn" onclick="goTo('start')">
+            Play again and see how different calls change the outcome.
+          </button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    function goTo(id) {
+      const passages = document.querySelectorAll('.passage');
+      passages.forEach(p => p.classList.remove('active'));
+      const next = document.getElementById(id);
+      if (next) {
+        next.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  </script>
+</body>
+</html>
