@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Responsive Flip Card Filmstrip</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .carousel-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1400px;
+    width: 100%;
+    position: relative;
+    padding: 0 60px; /* NEW – keeps arrows inside view */
+    box-sizing: border-box;
+  }
+
+  /* Arrow buttons */
+  .arrow-btn {
+    position: absolute;
+    top: 45%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    font-size: 20px;
+    color: #008390;
+    z-index: 10;
+  }
+
+  .arrow-left { left: 10px; }    /* FIXED */
+  .arrow-right { right: 10px; }  /* FIXED */
+
+  .filmstrip-viewport {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .filmstrip {
+    display: flex;
+    gap: 20px;
+    transition: transform 0.4s ease;
+  }
+
+  .flip-card {
+    width: 220px;
+    height: 160px;
+    flex: 0 0 auto;
+    perspective: 1000px;
+  }
+
+  .flip-card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+  }
+
+  .flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .flip-card-inner.flipped {
+    transform: rotateY(180deg);
+  }
+
+  .flip-card-front,
+  .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    box-sizing: border-box;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .flip-card-front { background: white; }
+  .flip-card-back {
+    background: #008390;
+    color: white;
+    transform: rotateY(180deg);
+  }
+
+  /* Dots */
+  .dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1px solid #666;
+    background: #ddd;
+    cursor: pointer;
+  }
+
+  .dot.active {
+    background: #008390;
+    border-color: #008390;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="carousel-wrapper">
+
+  <div class="arrow-btn arrow-left" id="arrowLeft">&#9664;</div>
+
+  <div class="filmstrip-viewport" id="viewport">
+    <div class="filmstrip" id="filmstrip">
+
+      <!-- Example cards -->
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front">Card 1</div><div class="flip-card-back">Back 1</div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front">Card 2</div><div class="flip-card-back">Back 2</div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front">Card 3</div><div class="flip-card-back">Back 3</div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front">Card 4</div><div class="flip-card-back">Back 4</div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front">Card 5</div><div class="flip-card-back">Back 5</div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front">Card 6</div><div class="flip-card-back">Back 6</div></div></div>
+      <div class="flip-card"><div class="flip-card-inner"><div class="flip-card-front">Card 7</div><div class="flip-card-back">Back 7</div></div></div>
+
+    </div>
+  </div>
+
+  <div class="arrow-btn arrow-right" id="arrowRight">&#9654;</div>
+
+  <div class="dots" id="dots"></div>
+
+</div>
+
+<script>
+  const filmstrip = document.getElementById("filmstrip");
+  const viewport = document.getElementById("viewport");
+  const dotsContainer = document.getElementById("dots");
+  const cards = Array.from(filmstrip.getElementsByClassName("flip-card"));
+
+  let visibleCards = 1;
+  let totalPages = 1;
+  let currentPage = 0;
+  const cardWidth = 220;
+  const gap = 20;
+
+  function recalcLayout() {
+    const viewportWidth = viewport.offsetWidth;
+    visibleCards = Math.floor(viewportWidth / (cardWidth + gap));
+    if (visibleCards < 1) visibleCards = 1;
+
+    totalPages = Math.ceil(cards.length / visibleCards);
+
+    buildDots();
+    renderPage(0);
+  }
+
+  function buildDots() {
+    dotsContainer.innerHTML = "";
+    for (let i = 0; i < totalPages; i++) {
+      const dot = document.createElement("div");
+      dot.className = "dot" + (i === 0 ? " active" : "");
+      dot.dataset.page = i;
+      dot.addEventListener("click", () => renderPage(i));
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  function updateDots() {
+    const dots = dotsContainer.querySelectorAll(".dot");
+    dots.forEach((dot, i) => dot.classList.toggle("active", i === currentPage));
+  }
+
+  function renderPage(page) {
+    currentPage = page;
+    const offset = -(page * (visibleCards * (cardWidth + gap)));
+    filmstrip.style.transform = `translateX(${offset}px)`;
+    updateDots();
+  }
+
+  document.getElementById("arrowLeft").addEventListener("click", () => {
+    renderPage(Math.max(0, currentPage - 1));
+  });
+
+  document.getElementById("arrowRight").addEventListener("click", () => {
+    renderPage(Math.min(totalPages - 1, currentPage + 1));
+  });
+
+  document.querySelectorAll(".flip-card-inner").forEach(inner => {
+    inner.addEventListener("click", () => inner.classList.toggle("flipped"));
+  });
+
+  window.addEventListener("load", recalcLayout);
+  window.addEventListener("resize", recalcLayout);
+</script>
+
+</body>
+</html>
